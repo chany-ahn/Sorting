@@ -3,6 +3,7 @@
 #include <vector>
 #include <random>
 using namespace sf;
+
 class Block {
 
 	public:
@@ -24,6 +25,10 @@ class Block {
 			this->block.setSize(Vector2f(n / 800.0f, this->weight));
 		}
 		
+		void setChosen(int x) {
+			this->chosen = x;
+		}
+		
 		//display an individual block
 		void displayBlock(RenderWindow& window, int x) {
 			this->block.setPosition(x, 0.0f);
@@ -31,6 +36,7 @@ class Block {
 				this->block.setFillColor(Color::Red);
 			window.draw(this->block);
 		}
+		
 };
 
 // generate an array from 1 - n shuffled around
@@ -55,13 +61,43 @@ void generateBlocks(std::vector<Block>& blocks, int n) {
 	}
 }
 
-void displayBlocks(RenderWindow& window, std::vector<Block> blocks) {
+// Acts as the update function
+void displayBlocks(RenderWindow& window, std::vector<Block>& blocks) {
 	for (int i = 0; i < blocks.size(); i++) {
 		blocks[i].displayBlock(window, i);
 	}
 }
 
-// Sorting Methods
+/* Sorting Methods */
+
+// Selection Sort
+
+void swapBlocks(std::vector<Block>& blocks, int i, int j) {
+	if (i != j) {
+		Block tmp = blocks[i];
+		blocks[i] = blocks[j];
+		blocks[j] = tmp;
+	}
+}
+
+
+void selectionSort(RenderWindow& window, std::vector<Block>& blocks) {
+	for (int i = 0; i < blocks.size(); i++) {
+		int curr = blocks[i].weight;
+		int minIdx = i;
+		for (int j = i+1; j < blocks.size(); j++) {
+			if (curr > blocks[j].weight) {
+				curr = blocks[j].weight;
+				minIdx = j;
+			}
+		}
+		swapBlocks(blocks, i, minIdx);
+		window.clear();
+		displayBlocks(window, blocks);
+		window.display();
+	}
+	
+}
 
 
 
@@ -82,13 +118,11 @@ int main() {
 				window.close();
 		}
 		
-		window.clear();
-		displayBlocks(window, blocks);
-		window.display();
+		//window.clear();
+		selectionSort(window, blocks);
+		//window.display();
 		
 	}
-	
-	return 0;
 }
 
 
