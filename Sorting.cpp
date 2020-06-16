@@ -70,7 +70,7 @@ void displayBlocks(RenderWindow& window, std::vector<Block>& blocks) {
 
 /* Sorting Methods */
 
-// Selection Sort
+// SELECTION SORT
 
 void swapBlocks(Block *block1, Block *block2) {
 		Block tmp = *block1;
@@ -96,9 +96,11 @@ void selectionSort(RenderWindow& window, std::vector<Block>& blocks) {
 	}
 }
 
+// BUBBLE SORT
+
 void bubbleSort(RenderWindow& window, std::vector<Block>& blocks) {
 	int i, j;
-	bool swapped;
+	bool swapped; // keep track of status of the array
 	for (i = 0; i < blocks.size()-1; i++) {
 		swapped = false;
 		for (j = 0; j < blocks.size()-1-i; j++) {
@@ -110,10 +112,28 @@ void bubbleSort(RenderWindow& window, std::vector<Block>& blocks) {
 				swapped = true;
 			}
 		}
-		if(!swapped) break;
+		if(!swapped) break; // if nothing has been swapped, the blocks are sorted
 	}
 }
 
+// RECURSIVE BUBBLE SORT
+
+void recursiveBubbleSort(RenderWindow& window, std::vector<Block>& blocks, int n) {
+	// Base Case
+	if(blocks.size() == 1)
+		return;
+	for (int i = 0; i < n-1; i++) {
+		// sort largest element to the back
+		if(blocks[i].weight > blocks[i+1].weight)
+			swapBlocks(&blocks[i], &blocks[i+1]);
+			window.clear();
+			displayBlocks(window, blocks);
+			window.display();
+	}
+	recursiveBubbleSort(window, blocks, n-1); // Sort the unsorted subarray
+}
+
+// 
 
 int main() {
 	// create main window
@@ -133,7 +153,7 @@ int main() {
 		}
 		
 		//window.clear();
-		bubbleSort(window, blocks);
+		recursiveBubbleSort(window, blocks, blocks.size());
 		//window.display();
 		
 	}
