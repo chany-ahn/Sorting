@@ -72,12 +72,10 @@ void displayBlocks(RenderWindow& window, std::vector<Block>& blocks) {
 
 // Selection Sort
 
-void swapBlocks(std::vector<Block>& blocks, int i, int j) {
-	if (i != j) {
-		Block tmp = blocks[i];
-		blocks[i] = blocks[j];
-		blocks[j] = tmp;
-	}
+void swapBlocks(Block *block1, Block *block2) {
+		Block tmp = *block1;
+		*block1 = *block2;
+		*block2 = tmp;
 }
 
 
@@ -91,14 +89,30 @@ void selectionSort(RenderWindow& window, std::vector<Block>& blocks) {
 				minIdx = j;
 			}
 		}
-		swapBlocks(blocks, i, minIdx);
+		swapBlocks(&blocks[i], &blocks[minIdx]);
 		window.clear();
 		displayBlocks(window, blocks);
 		window.display();
 	}
-	
 }
 
+void bubbleSort(RenderWindow& window, std::vector<Block>& blocks) {
+	int i, j;
+	bool swapped;
+	for (i = 0; i < blocks.size()-1; i++) {
+		swapped = false;
+		for (j = 0; j < blocks.size()-1-i; j++) {
+			if (blocks[j].weight > blocks[j+1].weight) {
+				swapBlocks(&blocks[j], &blocks[j+1]);
+				window.clear();
+				displayBlocks(window, blocks);
+				window.display();
+				swapped = true;
+			}
+		}
+		if(!swapped) break;
+	}
+}
 
 
 int main() {
@@ -119,7 +133,7 @@ int main() {
 		}
 		
 		//window.clear();
-		selectionSort(window, blocks);
+		bubbleSort(window, blocks);
 		//window.display();
 		
 	}
