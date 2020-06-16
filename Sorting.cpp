@@ -133,7 +133,26 @@ void recursiveBubbleSort(RenderWindow& window, std::vector<Block>& blocks, int n
 	recursiveBubbleSort(window, blocks, n-1); // Sort the unsorted subarray
 }
 
-// 
+// INSERTION SORT
+
+void insertionSort(RenderWindow& window, std::vector<Block>& blocks) {
+	int i, j, cur;
+	for (i = 1; i < blocks.size(); i++) {
+		cur = blocks[i].weight;
+		j=i-1;
+		while (j >= 0 && cur < blocks[j].weight) {
+			blocks[j+1] = blocks[j]; 
+			j--;
+			window.clear();
+			displayBlocks(window, blocks);
+			window.display();
+		}
+		blocks[j+1] = blocks[i];
+		window.clear();
+		displayBlocks(window, blocks);
+		window.display();
+	}
+}
 
 int main() {
 	// create main window
@@ -153,7 +172,7 @@ int main() {
 		}
 		
 		//window.clear();
-		recursiveBubbleSort(window, blocks, blocks.size());
+		insertionSort(window, blocks);
 		//window.display();
 		
 	}
