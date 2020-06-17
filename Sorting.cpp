@@ -22,9 +22,12 @@ class Block {
 		Block(int w, int n) {
 			this->weight = w;
 			this->chosen = 0;
-			this->block.setSize(Vector2f(n / 800.0f, this->weight));
+			this->block.setSize(Vector2f(100.0f, this->weight));
 		}
 		
+		void setBlockSize(RenderWindow& window) {
+			
+		}
 		void setChosen(int x) {
 			this->chosen = x;
 		}
@@ -208,26 +211,42 @@ void mergeSort(RenderWindow& window, std::vector<Block>& blocks, int l, int r) {
 
 // QUICK SORT
 
+// places pivot at correct index
 int partition(RenderWindow& window, std::vector<Block>& blocks, int low, int high) {
-	
+	Block pivot = blocks[high];
+	int j = low - 1;
+	for(int i = low; i <= high-1; i++) {
+		if (blocks[i].weight < pivot.weight) {
+			j++;
+			swapBlocks(&blocks[j], &blocks[i]);
+			displayBlocks(window, blocks);
+		}
+	}
+	swapBlocks(&blocks[j+1], &blocks[high]);
+	displayBlocks(window, blocks);
+	return j+1;
 }
 
 void quickSort(RenderWindow& window, std::vector<Block>& blocks, int low, int high) {
-	
+	if (low < high) {
+		int pivot = partition(window, blocks, low, high); // partitioning index
+		
+		quickSort(window, blocks, low, pivot-1);
+		quickSort(window, blocks, pivot+1, high);
+	}
 }
 
 
 int main() {
 	// create main window
-	RenderWindow window(VideoMode(800, 800), "Sorting");
+	RenderWindow window(VideoMode(100, 100), "Sorting");
 
 	// generate the blocks
-	int n = 800;
+	int n = 100;
 	std::vector<Block> blocks(n);
-	generateBlocks(blocks, n);
 	
 	while(window.isOpen()) {
-		
+		generateBlocks(blocks, n);
 		Event e;
 		while(window.pollEvent(e)) {
 			if(e.type == Event::Closed) 
@@ -235,7 +254,8 @@ int main() {
 		}
 		
 		//window.clear();
-		mergeSort(window, blocks, 0, blocks.size()-1);
+		// mergeSort(window, blocks, 0, blocks.size()-1);
+		quickSort(window, blocks, 0, blocks.size()-1);
 		//window.display();
 		
 	}
