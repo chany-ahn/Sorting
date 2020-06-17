@@ -63,9 +63,11 @@ void generateBlocks(std::vector<Block>& blocks, int n) {
 
 // Acts as the update function
 void displayBlocks(RenderWindow& window, std::vector<Block>& blocks) {
+	window.clear();
 	for (int i = 0; i < blocks.size(); i++) {
 		blocks[i].displayBlock(window, i);
 	}
+	window.display();
 }
 
 /* Sorting Methods */
@@ -90,9 +92,7 @@ void selectionSort(RenderWindow& window, std::vector<Block>& blocks) {
 			}
 		}
 		swapBlocks(&blocks[i], &blocks[minIdx]);
-		window.clear();
 		displayBlocks(window, blocks);
-		window.display();
 	}
 }
 
@@ -106,9 +106,7 @@ void bubbleSort(RenderWindow& window, std::vector<Block>& blocks) {
 		for (j = 0; j < blocks.size()-1-i; j++) {
 			if (blocks[j].weight > blocks[j+1].weight) {
 				swapBlocks(&blocks[j], &blocks[j+1]);
-				window.clear();
 				displayBlocks(window, blocks);
-				window.display();
 				swapped = true;
 			}
 		}
@@ -126,9 +124,7 @@ void recursiveBubbleSort(RenderWindow& window, std::vector<Block>& blocks, int n
 		// sort largest element to the back
 		if(blocks[i].weight > blocks[i+1].weight)
 			swapBlocks(&blocks[i], &blocks[i+1]);
-			window.clear();
 			displayBlocks(window, blocks);
-			window.display();
 	}
 	recursiveBubbleSort(window, blocks, n-1); // Sort the unsorted subarray
 }
@@ -143,16 +139,83 @@ void insertionSort(RenderWindow& window, std::vector<Block>& blocks) {
 		while (j >= 0 && cur < blocks[j].weight) {
 			blocks[j+1] = blocks[j]; 
 			j--;
-			window.clear();
 			displayBlocks(window, blocks);
-			window.display();
 		}
 		blocks[j+1] = blocks[i];
-		window.clear();
 		displayBlocks(window, blocks);
-		window.display();
 	}
 }
+
+// MERGESORT
+
+void merge(RenderWindow& window, std::vector<Block>& blocks, int l, int m, int r) {
+	int i, j, k;
+	int n1 = m - l + 1;
+	int n2 = r - m;
+	
+	std::vector<Block> left(n1);
+	std::vector<Block> right(n2);
+	
+	for(i = 0; i < n1; i++)
+		left[i] = blocks[l+i];
+	for(j = 0; j < n2; j++)
+		right[j] = blocks[m+1+j];
+	
+	i=0;
+	j=0;
+	k=l;
+	
+	while (i < n1 && j < n2) {
+		if (left[i].weight <= right[j].weight) {
+			blocks[k] = left[i];
+			i++;
+			displayBlocks(window, blocks);
+		}
+		else {
+			blocks[k] = right[j];
+			j++;			
+			displayBlocks(window, blocks);
+		}
+		k++;
+	}
+	
+	while (i < n1) {
+		// used to fill in any remainder of the array
+		blocks[k] = left[i];
+		i++;
+		k++;
+		displayBlocks(window, blocks);
+	}
+	
+	while (j < n2) {
+		// used to fill in any remainder of the array
+		blocks[k] = right[j];
+		j++;
+		k++;
+		displayBlocks(window, blocks);
+	}
+}
+
+void mergeSort(RenderWindow& window, std::vector<Block>& blocks, int l, int r) {
+	if (l < r) {
+		int m = l + (r-l) / 2;
+		mergeSort(window, blocks, l, m);
+		mergeSort(window, blocks, m+1, r);
+		merge(window, blocks, l, m, r);
+	}
+	
+}
+
+// QUICK SORT
+
+int partition(RenderWindow& window, std::vector<Block>& blocks, int low, int high) {
+	
+}
+
+void quickSort(RenderWindow& window, std::vector<Block>& blocks, int low, int high) {
+	
+}
+
 
 int main() {
 	// create main window
@@ -172,7 +235,7 @@ int main() {
 		}
 		
 		//window.clear();
-		insertionSort(window, blocks);
+		mergeSort(window, blocks, 0, blocks.size()-1);
 		//window.display();
 		
 	}
