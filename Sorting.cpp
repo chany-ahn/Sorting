@@ -19,24 +19,23 @@ class Block {
 		}
 		
 		//Constructor to set weight of the block and to build block
-		Block(int w, int n) {
+		Block(int w, int numOfBlocks, int windowSize) {
 			this->weight = w;
 			this->chosen = 0;
-			this->block.setSize(Vector2f(100.0f, this->weight));
+			this->block.setSize(Vector2f(windowSize / numOfBlocks, this->weight));
 		}
 		
 		void setBlockSize(RenderWindow& window) {
 			
 		}
+		
 		void setChosen(int x) {
 			this->chosen = x;
 		}
 		
 		//display an individual block
-		void displayBlock(RenderWindow& window, int x) {
-			this->block.setPosition(x, 0.0f);
-			if(this->chosen == 1)
-				this->block.setFillColor(Color::Red);
+		void displayBlock(RenderWindow& window, int x, int scale) {
+			this->block.setPosition(scale*x, 0.0f);
 			window.draw(this->block);
 		}
 		
@@ -57,18 +56,19 @@ std::vector<int> generateRandArray(int n) {
 }
 
 //generate a block
-void generateBlocks(std::vector<Block>& blocks, int n) {
+void generateBlocks(std::vector<Block>& blocks, int n, int w) {
 	std::vector<int> nums = generateRandArray(n);
-	for (int i = 0; i < blocks.size(); i++) {
-		blocks[i] = Block(nums[i], n);
+	for (int i = 0; i < n; i++) {
+		blocks.push_back(Block(3*nums[i], n, w));
 	}
 }
 
 // Acts as the update function
 void displayBlocks(RenderWindow& window, std::vector<Block>& blocks) {
+	int scale = window.getSize().x / blocks.size();
 	window.clear();
 	for (int i = 0; i < blocks.size(); i++) {
-		blocks[i].displayBlock(window, i);
+		blocks[i].displayBlock(window, i, scale);
 	}
 	window.display();
 }
@@ -137,14 +137,14 @@ void recursiveBubbleSort(RenderWindow& window, std::vector<Block>& blocks, int n
 void insertionSort(RenderWindow& window, std::vector<Block>& blocks) {
 	int i, j, cur;
 	for (i = 1; i < blocks.size(); i++) {
-		cur = blocks[i].weight;
+		Block cur = blocks[i];
 		j=i-1;
-		while (j >= 0 && cur < blocks[j].weight) {
+		while (j >= 0 && cur.weight < blocks[j].weight) {
 			blocks[j+1] = blocks[j]; 
 			j--;
 			displayBlocks(window, blocks);
 		}
-		blocks[j+1] = blocks[i];
+		blocks[j+1] = cur;
 		displayBlocks(window, blocks);
 	}
 }
@@ -236,28 +236,150 @@ void quickSort(RenderWindow& window, std::vector<Block>& blocks, int low, int hi
 	}
 }
 
+// HEAP SORT
+
+void heapify(RenderWindow& window, std::vector<Block>& blocks, int n, int i) {
+	// where n is the size of the heap!
+	
+	// heapify the subtree
+	int largestIdx = i; // input index is the root
+	
+	// need left and right child for comparisons
+	int left = 2*i+1;
+	int right = 2*i+2;
+	
+	
+	if (left < n && blocks[left].weight > blocks[largestIdx].weight) {
+		largestIdx = left;
+	}
+	if (right < n && blocks[right].weight > blocks[largestIdx].weight) {
+		largestIdx = right;
+	}
+	
+	if (largestIdx != i) {
+		// so long as the largest is not the root
+		swapBlocks(&blocks[i], &blocks[largestIdx]); // swap the root with the largest child
+		displayBlocks(window, blocks);
+		heapify(window, blocks, n, largestIdx); // call recursively to form the max heap
+	}
+}
+
+void heapSort(RenderWindow& window, std::vector<Block>& blocks) {
+	// build the heap
+	for (int i = (blocks.size()/2)-1; i >= 0; i--) {
+		// heapify each root for every subtree
+		heapify(window, blocks, blocks.size(), i);
+	}		
+	
+	// extract the heap in the proper order
+	for(int i = blocks.size()-1; i > 0; i--) {
+		swapBlocks(&blocks[0], &blocks[i]);
+		displayBlocks(window, blocks);
+		// re-heapify the tree except for the last index where the max index lies
+		heapify(window, blocks, i, 0); 
+	}
+	
+}
+
+// to choose the sorting algo of choice
+void createStartBoard(RenderWindow& window) {
+	int n = 6; // number of sorting algorithms I want to include
+	int x = (int) window.getSize().x;
+	int y = (int) window.getSize().y;
+	
+	RectangleShape rect; 
+	rect.setSize(Vector2f(x, y/n));
+	rect.setOutlineThickness(0.5f);
+	rect.setOutlineColor(Color::Black);
+	
+	// Text!
+	sf::Font font;
+	if(!(font.loadFromFile("OpenSans-Regular.ttf"))) {
+		std::cout << "No font loaded!\n";
+	}
+	std::vector<Text> texts;
+	texts = {
+		Text("BubbleSort", font),
+		Text("InsertionSort", font),
+		Text("SelectionSort", font),
+		Text("MergeSort", font),
+		Text("QuickSort", font),
+		Text("HeapSort", font)
+	};
+	
+	window.clear();
+	int j = 0;
+	for (int i = 0; i < y; i += y/n) {
+		rect.setPosition(0, i+1); // set the position equally spaces across y axis
+		window.draw(rect);
+		if (j < n) {
+			texts[j].setPosition(0, i);
+			texts[j].setFillColor(Color::Red);
+			window.draw(texts[j]);
+			j++;
+		}
+	}
+	window.display();
+	
+}
+
+void update(RenderWindow& window, std::vector<Block>& blocks, float y) {
+	int w = (int) window.getSize().y;
+	int i = w / 6;
+	if ( y >= 0 && y <= i ) 
+		bubbleSort(window, blocks);
+	
+	else if ( y >= i+1 && y <= 2*i ) 
+		insertionSort(window, blocks);
+	
+	else if ( y >= 2*i+1 && y <= 3*i ) 
+		selectionSort(window, blocks);
+	
+	else if ( y >= 3*i+1 && y <= 4*i ) 
+		mergeSort(window, blocks, 0, blocks.size()-1);
+	
+	else if ( y >= 4*i+1 && y <= 5*i ) 
+		quickSort(window, blocks, 0, blocks.size()-1);
+	
+	else if ( y >= 5*i+1 && y <= 6*i) 
+		heapSort(window, blocks);
+	
+	else 
+		return;
+	
+}
 
 int main() {
 	// create main window
-	RenderWindow window(VideoMode(100, 100), "Sorting");
-
-	// generate the blocks
-	int n = 100;
-	std::vector<Block> blocks(n);
-	
+	int n; // number of blocks
+	int w = 400; // size of window
+	float y = -1; // to record y position of the mouse
+	RenderWindow window(VideoMode(w, w), "Sorting");
 	while(window.isOpen()) {
-		generateBlocks(blocks, n);
+		std::vector<Block> blocks;
 		Event e;
 		while(window.pollEvent(e)) {
 			if(e.type == Event::Closed) 
 				window.close();
+			if(e.type == Event::TextEntered) {
+				window.close();
+			}
 		}
-		
-		//window.clear();
-		// mergeSort(window, blocks, 0, blocks.size()-1);
-		quickSort(window, blocks, 0, blocks.size()-1);
-		//window.display();
-		
+		createStartBoard(window);
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+			y = Mouse::getPosition(window).y;
+			if (y >= 0 && y <= window.getSize().y / 2) {
+				n = 40;
+				generateBlocks(blocks, n, w);
+			}
+			else {
+				n = 80;
+				generateBlocks(blocks,n, w);
+			}
+			window.clear();
+			std::cout << y << std::endl;
+			update(window, blocks, y);
+		}
 	}
 }
 
