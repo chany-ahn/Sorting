@@ -352,8 +352,8 @@ void update(RenderWindow& window, std::vector<Block>& blocks, float y) {
 int main() {
 	// create main window
 	int n; // number of blocks
-	int w = 400; // size of window
-	float y = -1; // to record y position of the mouse
+	int w = 300; // size of window
+	float y; // to record y position of the mouse
 	RenderWindow window(VideoMode(w, w), "Sorting");
 	while(window.isOpen()) {
 		std::vector<Block> blocks;
