@@ -369,11 +369,11 @@ int main() {
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 			y = Mouse::getPosition(window).y;
 			if (y >= 0 && y <= window.getSize().y / 2) {
-				n = 40;
+				n = 60;
 				generateBlocks(blocks, n, w);
 			}
 			else {
-				n = 80;
+				n = 100;
 				generateBlocks(blocks,n, w);
 			}
 			window.clear();
