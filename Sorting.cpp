@@ -25,10 +25,6 @@ class Block {
 			this->block.setSize(Vector2f(windowSize / numOfBlocks, this->weight));
 		}
 		
-		void setBlockSize(RenderWindow& window) {
-			
-		}
-		
 		void setChosen(int x) {
 			this->chosen = x;
 		}
@@ -169,6 +165,7 @@ void merge(RenderWindow& window, std::vector<Block>& blocks, int l, int m, int r
 	k=l;
 	
 	while (i < n1 && j < n2) {
+		// begin merging the two partitioned sides into the sorted array.
 		if (left[i].weight <= right[j].weight) {
 			blocks[k] = left[i];
 			i++;
@@ -382,10 +379,3 @@ int main() {
 		}
 	}
 }
-
-
-
-
-
-
-
